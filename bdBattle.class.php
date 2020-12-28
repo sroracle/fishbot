@@ -203,27 +203,6 @@ class bdBattle {
 
         $id = $this->getPlayerId($this->players, $player);
         $this->players[$id]["health"] = 10000;
-
-        // add to death count
-        $numdeaths = $this->addToDeathCount($player);
-        if ($numdeaths == 1 or substr($numdeaths, -1) == "1" && $numdeaths !== 11) {
-            $a = "{$numdeaths}st";
-        } elseif ($numdeaths == 2 or substr($numdeaths, -1) == "2" && $numdeaths !== 12) {
-            $a = "{$numdeaths}nd";
-        } elseif ($numdeaths == 3 or substr($numdeaths, -1) == "3" && $numdeaths !== 13) {
-            $a = "{$numdeaths}rd";
-        } else {
-            $a = "{$numdeaths}th";
-        }
-
-        // pick a respawn method
-        $lolo = rand(1, 2);
-        $they_have = $this->they_now($player, 2);
-        if ($lolo == 1) {
-            $botobj->sndMsg($botobj->chan, "However, through the use of ancient magic rituals, {$they_have} been reborn with full health for the {$a} time.");
-        } else {
-            $botobj->sndMsg($botobj->chan, "However, thanks to new technology, {$they_have} respawned with full health for the {$a} time.");
-        }
     }
 
     function checkIsVictimSelf($victim) {
@@ -430,37 +409,6 @@ class bdBattle {
         return $result;
     }
 
-    function getNumDeaths($player) {
-        $player = mysql_real_escape_string($player);
-
-        $result = mysql_query("SELECT * FROM battleusers WHERE nick='{$player}'");
-        if (!mysql_num_rows($result)) {
-            // player isn't in db
-            echo "numdeaths = 0\n";
-            return false;
-        } else {
-            $a = mysql_fetch_array($result);
-            print_r($a);
-            $numdeaths = $a[1];
-            return $numdeaths;
-        }
-    }
-
-    function addToDeathCount($player) {
-        $numdeaths = $this->getNumDeaths($player);
-        $player = mysql_real_escape_string($player);
-        if (!$numdeaths) {
-            // add new record to db
-            $result = mysql_query("INSERT INTO battleusers(nick, deaths) VALUES('{$player}', 1)");
-            return 1;
-        } else {
-            // update
-            $numdeaths++;
-            $result = mysql_query("UPDATE battleusers SET deaths = '{$numdeaths}' WHERE nick = '{$player}'");
-            return $numdeaths;
-        }
-    }
-
     function they_now_gen($gender, $type) {
         /* $type = 1 - "He now has", "She now has", "They now have"
          * $type = 2 - "he has been", "she has been", "they have been" */
@@ -493,17 +441,8 @@ class bdBattle {
     }
 
     function getPlayerGender($player) {
-        $player = mysql_real_escape_string($player);
-
-        $result = mysql_query("SELECT * FROM battleusers WHERE nick='{$player}'");
-        if (!mysql_num_rows($result)) {
             // player isn't in db
             return "o"; // unspecified gender
-        } else {
-            $a = mysql_fetch_array($result);
-            $gender = $a[2];
-            return $gender;
-        }
     }
 
     function they_now($player, $type) {
@@ -511,21 +450,6 @@ class bdBattle {
         return $this->they_now_gen($gender, $type);
     }
 
-    function setPlayerGender($player, $gender) {
-        $numdeaths = $this->getNumDeaths($player); // to check if player is in db
-        $player = mysql_real_escape_string($player);
-        if (!$numdeaths) {
-            // add new record to db
-            $result = mysql_query("INSERT INTO battleusers(nick, deaths, gender) VALUES('{$player}', 1, '{$gender}')");
-            echo "setting {$player}'s gender to {$gender} and adding new db row\n";
-            return true;
-        } else {
-            // update
-            $result = mysql_query("UPDATE battleusers SET gender = '{$gender}' WHERE nick = '{$player}'");
-            echo "setting {$player}'s gender to {$gender}\n";
-            return true;
-        }
-    }
 }
 
 ?>

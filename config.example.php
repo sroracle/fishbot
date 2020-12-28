@@ -16,12 +16,6 @@ $config['server'] = "irc.interlinked.me";
 $config['port'] = 6667;
 $config['channels'] = array("#Sporks", "#fishbot"); // the channel names MUST be capitalised exactly as they appear when you /join (so #Sporks is correct, #sporks is not)
 
-// database information for mysql
-$config['db-host'] = "";
-$config['db-username'] = "";
-$config['db-password'] = "";
-$config['db-name'] = "fishbot";
-
 // other
 $config['commandchar'] = ".";
 

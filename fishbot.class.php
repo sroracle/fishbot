@@ -259,38 +259,6 @@ class fishbot {
         echo "Identified to NickServ\n";
     }
 
-    function hasPerm($permtocheckfor, $reply = 1, $host = false) {
-        // depends on having made a mysql connection, most likely through the quotes class
-        // because i'm fucking dumb
-        if (!$host) {
-            $perms = mysql_query("SELECT * FROM users WHERE hostname='{$this->fullhostname}'");
-        } else {
-            $perms = mysql_query("SELECT * FROM users WHERE hostname='{$host}'");
-        }
-        if (mysql_num_rows($perms) == 0) {
-            if ($reply) {
-                $this->sndMsg($this->chan, "{$this->nick}: You don't have the $permtocheckfor permission.");
-            } else {
-                return false;
-            }
-        } else {
-            $perms = mysql_fetch_array($perms);
-            $perms = explode(" ", $perms['permissions']);
-            if ($permtocheckfor == "ignore" && in_array("admin", $perms)) {
-                return false;
-            }
-            if (in_array($permtocheckfor, $perms) || in_array("admin", $perms)) {
-                return true;
-            } else {
-                if ($reply) {
-                    $this->sndMsg($this->chan, "{$this->nick}: You don't have the $permtocheckfor permission.");
-                } else {
-                    return false;
-                }
-            }
-        }
-    }
-
     function logTo($filename) {
         $this->log = true;
         $this->logfile = $filename;
