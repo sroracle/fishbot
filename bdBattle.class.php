@@ -108,6 +108,8 @@ class bdBattle {
     }
 
     function getCleanWepName($weapon) {
+        if (!$weapon)
+            return $weapon;
         /* Cleans the name of what someone's attacking someone with */
         $sweapon = explode(" ", $weapon);
         // check for a/an
@@ -157,6 +159,8 @@ class bdBattle {
     }
 
     function getCleanToolName($tool) {
+        if (!$tool)
+            return $tool;
         /* getCleanWepName() but for healing; too lazy to change $weapon */
         $stool = explode(" ", $tool);
         // check for a/an/the
@@ -321,7 +325,7 @@ class bdBattle {
     }
 
     function checkForHealCmd($string, $botobj) {
-        if (preg_match("/^\001ACTION heals (.*) with (.*)\001$/i", $string, $blah)) {
+        if (preg_match("/^\001ACTION heals ([^ ]*)(?: with (.*))?\001$/i", $string, $blah)) {
             $this->healer = $botobj->nick;
             $this->patient = trim($blah[1]);
             if ($this->checkIsVictimSelf($this->patient)) {

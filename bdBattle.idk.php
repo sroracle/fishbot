@@ -18,7 +18,7 @@ function isPlural($thing) {
 function doActionStuff($botobj, $batobj) {
 	$fb = $botobj;
 	$bat = $batobj;
-	if($bat->checkAttkMatch("(?:attacks|stabs|fites) (.*)(?: with (.*))", $fb->msg, $fb)) {
+	if($bat->checkAttkMatch("(?:attacks|stabs|fites) ([^ ]*)(?: with (.*))?", $fb->msg, $fb)) {
 			$result = $bat->doAttacking($bat->attacker, $bat->victim, $bat->weapon);
 			/* [0]/["type"] = type of result: normal, fatalNormal, crit, fatalCrit, miss
 			 * [1]/["dmg"] = damage done
@@ -26,8 +26,12 @@ function doActionStuff($botobj, $batobj) {
 			 * [3]/["wep"] = "clean" weapon name */
 
 			// check for fite
-			if(preg_match("/\001ACTION fites (.*)\001/", $fb->msg)) {
-				$result['wep'] = "the 1v1 fite irl";
+			if(!$result['wep']) {
+				if(preg_match("/\001ACTION fites (.*)\001/", $fb->msg)) {
+					$result['wep'] = "the 1v1 fite irl";
+				} else {
+					$result['wep'] = "the knife";
+				}
 			}
 
 			switch($result["type"]) {
@@ -193,18 +197,28 @@ function doActionStuff($botobj, $batobj) {
 			$matched = true;
 	} elseif($bat->checkForHealCmd($fb->msg, $fb)) {
 		$result = $bat->doHealing($bat->patient, $bat->healer, $bat->tool);
-		
+		if ($result["tool"]) {
+			$with_tool = " with {$result['tool']}";
+			$maim_self = "{$result['tool']} hurt {$bat->healer}";
+			$fatal_self = "{$result['tool']} KILLED {$bat->healer}";
+		}
+		else {
+			$with_tool = "";
+			$maim_self = "{$bat->healer} hurt themself";
+			$fatal_self = "{$bat->healer} KILLED themself";
+		}
+
 		if($result['type'] == "fail") {
-			$fb->sndMsg($fb->chan, "{$bat->healer} tried to heal {$bat->patient} with {$result['tool']}, however {$bat->they_now($bat->healer, 3)} failed. :(");
+			$fb->sndMsg($fb->chan, "{$bat->healer} tried to heal {$bat->patient}{$with_tool}, however {$bat->they_now($bat->healer, 3)} failed. :(");
 			$manualsnd = true;
 		} elseif($result['type'] == "success") {
-			$msg = "{$bat->healer} managed to heal {$bat->patient} for {$result['healing']} HP with {$result['tool']}!";
+			$msg = "{$bat->healer} managed to heal {$bat->patient} for {$result['healing']} HP{$with_tool}!";
 			$manualsnd = false;
 		} elseif($result['type'] == "backfire") {
-			$msg = "In a freak accident, {$result['tool']} hurt {$bat->healer} for {$result['healing']} damage instead of healing {$bat->patient}!";
+			$msg = "In a freak accident, {$maim_self} for {$result['healing']} damage instead of healing {$bat->patient}!";
 			$manualsnd = false;
 		} elseif($result['type'] == "fatalbackfire") {
-			$fb->sndMsg($fb->chan, "In a freak accident, {$result['tool']} KILLED {$bat->healer} with {$result['healing']} damage instead of healing {$bat->patient}!");
+			$fb->sndMsg($fb->chan, "In a freak accident, {$fatal_self} with {$result['healing']} damage instead of healing {$bat->patient}!");
 			$bat->doRespawn($bat->healer, $fb);
 			$manualsnd = true;
 		}
