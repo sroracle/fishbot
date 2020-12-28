@@ -186,14 +186,6 @@ class bdBattle {
                 $pronounused = 0;
         }
 
-        // check for "their"
-        if (!$pronounused) {
-            // add their
-            if (!stristr($tool, "'s")) {
-                $tool = "\"{$tool}\"";
-            }
-        }
-
         return $tool;
     }
 
