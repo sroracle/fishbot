@@ -19,9 +19,6 @@ function doActionStuff($botobj, $batobj) {
 	$fb = $botobj;
 	$bat = $batobj;
 	if($bat->checkAttkMatch("attacks (.*) with (.*)", $fb->msg, $fb) or $bat->checkAttkMatch("stabs (.*) with (.*)", $fb->msg, $fb) or $bat->checkAttkMatch("fites (.*)", $fb->msg, $fb)) {
-		if($bat->victim == $fb->botnick) {
-			$fb->sndMsg($fb->chan, "get off me");
-		} else {
 			$result = $bat->doAttacking($bat->attacker, $bat->victim, $bat->weapon);
 			/* [0]/["type"] = type of result: normal, fatalNormal, crit, fatalCrit, miss
 			 * [1]/["dmg"] = damage done
@@ -87,11 +84,7 @@ function doActionStuff($botobj, $batobj) {
 				$msg = $msg." They now have {$result['hp']} HP.";
 			}
 			$fb->sndMsg($fb->chan, $msg);*/
-		}
 	} elseif($bat->checkAttkMatch("throws (.*) at (.*)", $fb->msg, $fb, true) or $bat->checkAttkMatch("drops (.*) on (.*)", $fb->msg, $fb, true) or $bat->checkAttkMatch("thwacks (.*) with (.*)", $fb->msg, $fb)) {	
-		if($bat->victim == $fb->botnick) {
-			$fb->sndMsg($fb->chan, "owww :(");
-		} else {
 			$result = $bat->doAttacking($bat->attacker, $bat->victim, $bat->weapon);
 			
 			$result['wep'] = ucfirst($result['wep']);
@@ -180,11 +173,7 @@ function doActionStuff($botobj, $batobj) {
 					//$fb->sndMsg($fb->chan, "{$bat->victim} now has {$result['hp']} HP.");
 			}
 			$matched = true;
-		}
 	} elseif($bat->checkAttkMatch("casts (.*) at (.*)", $fb->msg, $fb, true) or $bat->checkAttkMatch("casts (.*) on (.*)", $fb->msg, $fb, true)) {
-		if($bat->victim == $fb->botnick) {
-			$fb->sndMsg($fb->chan, "I am immune to your petty spells! Muahahaha!");
-		} else {
 			$result = $bat->doAttacking($bat->attacker, $bat->victim, $bat->weapon);
 			
 			// do another the check!
@@ -224,7 +213,6 @@ function doActionStuff($botobj, $batobj) {
 					//
 			}
 			$matched = true;
-		}
 	} elseif($bat->checkForHealCmd($fb->msg, $fb)) {
 		$result = $bat->doHealing($bat->patient, $bat->healer, $bat->tool);
 		
